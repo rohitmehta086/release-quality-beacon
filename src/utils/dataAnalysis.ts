@@ -1,4 +1,5 @@
 
+
 import type { TestRunData, BugReportData, DashboardMetrics, BugTrends, TestCasePassRate, BugCountPerRun } from '@/types/dashboard';
 
 // Define flexible types for incoming Excel data that might have different column names
@@ -41,25 +42,31 @@ export const analyzeDashboardData = (
   console.log('Analyzing bug report data:', bugReportData);
 
   // Transform data keys to handle different Excel column naming conventions
-  const normalizedTestRuns = testRunData.map(row => ({
-    TestRunID: row.TestRunID || row['Test Run ID'] || row.testRunId || '',
-    Release: row.Release || row.release || row.Version || '',
-    TestCasesTotal: Number(row.TestCasesTotal || row['Test Cases Total'] || row.total || 0),
-    TestCasesPassed: Number(row.TestCasesPassed || row['Test Cases Passed'] || row.passed || 0),
-    TestCasesFailed: Number(row.TestCasesFailed || row['Test Cases Failed'] || row.failed || 0),
-    PassRate: Number(row.PassRate || row['Pass Rate'] || 0),
-    ExecutionDate: row.ExecutionDate || row['Execution Date'] || row.date || ''
-  }));
+  const normalizedTestRuns = testRunData.map(row => {
+    const anyRow = row as any; // Type assertion to access all properties
+    return {
+      TestRunID: anyRow.TestRunID || anyRow['Test Run ID'] || anyRow.testRunId || '',
+      Release: anyRow.Release || anyRow.release || anyRow.Version || '',
+      TestCasesTotal: Number(anyRow.TestCasesTotal || anyRow['Test Cases Total'] || anyRow.total || 0),
+      TestCasesPassed: Number(anyRow.TestCasesPassed || anyRow['Test Cases Passed'] || anyRow.passed || 0),
+      TestCasesFailed: Number(anyRow.TestCasesFailed || anyRow['Test Cases Failed'] || anyRow.failed || 0),
+      PassRate: Number(anyRow.PassRate || anyRow['Pass Rate'] || 0),
+      ExecutionDate: anyRow.ExecutionDate || anyRow['Execution Date'] || anyRow.date || ''
+    };
+  });
 
-  const normalizedBugReports = bugReportData.map(row => ({
-    BugID: row.BugID || row['Bug ID'] || row.id || '',
-    TestRunID: row.TestRunID || row['Test Run ID'] || row.testRunId || '',
-    Severity: (row.Severity || row.severity || 'Medium') as 'High' | 'Medium' | 'Low',
-    Status: (row.Status || row.status || 'Open') as 'Open' | 'Closed' | 'In Progress',
-    ReportedDate: row.ReportedDate || row['Reported Date'] || row.date || '',
-    ClosedDate: row.ClosedDate || row['Closed Date'] || undefined,
-    Description: row.Description || row.description || ''
-  }));
+  const normalizedBugReports = bugReportData.map(row => {
+    const anyRow = row as any; // Type assertion to access all properties
+    return {
+      BugID: anyRow.BugID || anyRow['Bug ID'] || anyRow.id || '',
+      TestRunID: anyRow.TestRunID || anyRow['Test Run ID'] || anyRow.testRunId || '',
+      Severity: (anyRow.Severity || anyRow.severity || 'Medium') as 'High' | 'Medium' | 'Low',
+      Status: (anyRow.Status || anyRow.status || 'Open') as 'Open' | 'Closed' | 'In Progress',
+      ReportedDate: anyRow.ReportedDate || anyRow['Reported Date'] || anyRow.date || '',
+      ClosedDate: anyRow.ClosedDate || anyRow['Closed Date'] || undefined,
+      Description: anyRow.Description || anyRow.description || ''
+    };
+  });
 
   // Calculate Test Case Pass Rate by Release
   const releasePassRates = new Map<string, number[]>();
@@ -148,3 +155,4 @@ export const analyzeDashboardData = (
     bugCountPerRun
   };
 };
+
