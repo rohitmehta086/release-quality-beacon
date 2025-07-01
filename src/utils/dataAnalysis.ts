@@ -1,9 +1,41 @@
 
 import type { TestRunData, BugReportData, DashboardMetrics, BugTrends, TestCasePassRate, BugCountPerRun } from '@/types/dashboard';
 
+// Define flexible types for incoming Excel data that might have different column names
+type ExcelTestRunData = TestRunData | {
+  [key: string]: any;
+  'Test Run ID'?: string;
+  testRunId?: string;
+  release?: string;
+  Version?: string;
+  'Test Cases Total'?: number;
+  total?: number;
+  'Test Cases Passed'?: number;
+  passed?: number;
+  'Test Cases Failed'?: number;
+  failed?: number;
+  'Pass Rate'?: number;
+  'Execution Date'?: string;
+  date?: string;
+};
+
+type ExcelBugReportData = BugReportData | {
+  [key: string]: any;
+  'Bug ID'?: string;
+  id?: string;
+  'Test Run ID'?: string;
+  testRunId?: string;
+  severity?: string;
+  status?: string;
+  'Reported Date'?: string;
+  date?: string;
+  'Closed Date'?: string;
+  description?: string;
+};
+
 export const analyzeDashboardData = (
-  testRunData: TestRunData[], 
-  bugReportData: BugReportData[]
+  testRunData: ExcelTestRunData[], 
+  bugReportData: ExcelBugReportData[]
 ): DashboardMetrics => {
   console.log('Analyzing test run data:', testRunData);
   console.log('Analyzing bug report data:', bugReportData);
